@@ -19,7 +19,7 @@ name = "eel"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "ursina" },
+    { name = "pyxel" },
 ]
 
 [package.metadata]

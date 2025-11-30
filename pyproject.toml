@@ -1,12 +1,12 @@
 [project]
-name = "eel"
+name = "Chew or Die"
 version = "0.1.0"
-description = "A 3D extension of Snake written in Python"
+description = "A Pyxel-based retro arcade game combining snake game mechanics with a Julia set fractal mini-game"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "ursina>=8.2.0",
+    "pyxel>=2.5.10",
 ]
 
 [project.scripts]
-eel = "main:main"
+chew_or_die = "main:main"
