@@ -2,7 +2,7 @@
 ![Game Screen](./assets/game_mode.png)
 ![Fractal Screen](./assets/fractal_mode.png)
 
-**Chew or Die** is a Pyxel-based retro arcade game combining snake game mechanics with a Julia set fractal mini-game. 
+**Chew or Die** is a Pyxel-based retro arcade game combining snake game mechanics but you have to chew to reach a target with a Julia set fractal mini-game. 
 
 ### Architecture
 The game uses a **state machine pattern** with four distinct modes:
@@ -16,6 +16,7 @@ The game uses a **state machine pattern** with four distinct modes:
 2. **`Player` class**: Snake-like entity with direction-based movement, wrapping edges (see `update_movement`)
 3. **`DotManager` class**: Spawns and manages falling obstacle dots; difficulty scales with score
 4. **`JuliaSet` class**: Renders Julia set fractal and handles fractal mini-game logic
+5. **`ui` class**: Renders illustration of objects
 
 ## Critical Patterns & Conventions
 
@@ -30,10 +31,7 @@ The game uses a **state machine pattern** with four distinct modes:
 - **Constants grouped by concern**: Game constants (WIDTH=512, HEIGHT=384), fractal constants (MAX_ITER=40, bounds), mode flags
 
 ### Difficulty Progression
-Difficulty is driven by **score** and **distance from base Julia constant**:
-- Dot radius: `min(3, 1 + int(scale_factor))` where `scale_factor = D * 10`
-- Spawn interval: decreases with score (`max(6, 16 - level*2)`) and fractal distance
-- See `DotManager.update_difficulty()` for the complete formula
+Difficulty is driven by **score** and **distance from base Julia constant**
 
 ### Collision Detection
 - **Dot collision**: AABB check against dot radius (includes margin)
@@ -48,28 +46,35 @@ Difficulty is driven by **score** and **distance from base Julia constant**:
 - **Performance note**: Fractal is rendered at 2x2 pixel step to reduce lag
 
 ### Input Handling
-- **Game mode**: WASD or arrow keys for movement; direction changes only if not 180° reversal
+- **Game mode**: Arrow keys for movement; direction changes only if not 180° reversal
 - **Menu**: Mouse click detection via `_btn_hover()` utility
 
-## Developer Workflows
-
 ### Running the Game
+1. Create a virtual environment (venv)
+```bash
+python3 -m venv .venv
+```
+2. Activate virtual environment
+```bash
+source .venv/bin/activate
+```
+3. Download pyxel into venv
+```bash
+pip install pyxel
+```
+4. Run the main.py file
 ```bash
 python3 main.py
 ```
-Requires: `pyxel` package in environment (venv at `./.venv/`)
-
-### Audio
-Sound defined programmatically:
-```python
-pyxel.sound(0).set("c2e2g2c3", "p", "6", "n", 5)  # Slice penalty sound
+or if you have only version of python installed:
+```bash
+python main.py
 ```
-Toggle via menu button; plays on dot collision if enabled.
 
 ## Common Modification Points
 
 ### Adjusting Game Balance
-- **Fractal difficulty**: Modify `CHEWING_TIME_SECONDS` (15 seconds default), `WINNING_TOLERANCE` (0.015)
+- **Fractal difficulty**: Modify `CHEWING_TIME_SECONDS` (10 seconds default), `WINNING_TOLERANCE` (0.02)
 - **Dot spawn**: Edit `DotManager.difficulty_level` formula or base `dot_spawn_interval`
 - **Score thresholds**: `score >= 10` gates dot spawning; `score // 30` determines difficulty level
 
@@ -77,11 +82,6 @@ Toggle via menu button; plays on dot collision if enabled.
 - Buttons use `draw_button()` pattern: takes position, text, and two colors (base, hover)
 - Text positioning is manual (x, y offsets); use `WIDTH // 2` for centering
 - Palette: Pyxel colors 0-15; "RAINBOW_COLORS" array defines snake segment progression
-
-### Extending Game Logic
-- New game states: Add mode constant, then handle in `update()` and `draw()` dispatcher
-- New collision types: Add check in appropriate `update_*` method; return status string
-- Animation: Use `self.sliced_fx_timer` pattern (countdown timer that triggers draw effects)
 
 ## Known Quirks & TODOs
 - "why does time lag when resolution is good ToT" — 2x2 pixel step is performance trade-off
