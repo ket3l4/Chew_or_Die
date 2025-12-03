@@ -85,3 +85,4 @@ Toggle via menu button; plays on dot collision if enabled.
 
 ## Known Quirks & TODOs
 - "why does time lag when resolution is good ToT" — 2x2 pixel step is performance trade-off
+

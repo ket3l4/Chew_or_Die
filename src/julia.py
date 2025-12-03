@@ -1,6 +1,13 @@
+"""Julia set fractal rendering and chew-mini-game logic.
+
+This module renders a reduced-resolution Julia set and exposes methods to
+manage the chewing mini-game (timing, input, and win/lose detection).
+"""
+
 import pyxel
 import random
 import math
+from typing import Tuple
 from constants import (MAX_ITER, BASE_C_REAL, BASE_C_IMAG, CHEWING_TIME_SECONDS,
                        FRACTAL_MIN_X, FRACTAL_MAX_X, FRACTAL_MIN_Y, FRACTAL_MAX_Y)
 
@@ -84,35 +91,27 @@ class Julia_set:
         return "CONTINUE"
 
     def draw_fractal(self):
-        pyxel.cls(0)
-        sx = (FRACTAL_MAX_X - FRACTAL_MIN_X) / self.WIDTH
-        sy = (FRACTAL_MAX_Y - FRACTAL_MIN_Y) / self.HEIGHT
-        # reduced resolution for performance
-        for x in range(0, self.WIDTH, 2):
-            real = FRACTAL_MIN_X + x * sx
-            for y in range(0, self.HEIGHT, 2):
-                imag = FRACTAL_MIN_Y + y * sy
-                it = self.julia_iter(complex(real, imag), self.c_fixed)
-                color = 0 if it == MAX_ITER else (it % 14) + 2
+        # Map pixels to complex plane coordinates
+        scale_x = (FRACTAL_MAX_X - FRACTAL_MIN_X) / self.WIDTH
+        scale_y = (FRACTAL_MAX_Y - FRACTAL_MIN_Y) / self.HEIGHT
 
-                pyxel.pset(x, y, color)
-                pyxel.pset(x + 1, y, color)
-                pyxel.pset(x, y + 1, color)
-                pyxel.pset(x + 1, y + 1, color)
+        # Draw at 2x2 pixel blocks for performance
+        step = 2
+        for x_pixel in range(0, self.WIDTH, step):
+            real = FRACTAL_MIN_X + x_pixel * scale_x
+            for y_pixel in range(0, self.HEIGHT, step):
+                imag = FRACTAL_MIN_Y + y_pixel * scale_y
+                iter_count = self.julia_iter(complex(real, imag), self.c_fixed)
+                color = 0 if iter_count == MAX_ITER else (iter_count % 14) + 2
 
+                pyxel.pset(x_pixel, y_pixel, color)
+                pyxel.pset(x_pixel + 1, y_pixel, color)
+                pyxel.pset(x_pixel, y_pixel + 1, color)
+                pyxel.pset(x_pixel + 1, y_pixel + 1, color)
+
+        # HUD overlay showing current/target C and remaining time
         pyxel.rect(0, 0, self.WIDTH, 24, 0)
-
-        pyxel.text(4, 4,
-                   f"CURRENT C: {self.c_real:.2f} + {self.c_imag:.2f}i",
-                   7)
-        pyxel.text(self.WIDTH - 70, 4,
-                   f"TIME: {self.chew_timer // self.FPS}",
-                   9)
-
-        pyxel.text(4, 14,
-                   f"TARGET C: {self.target_c_real:.2f} + {self.target_c_imag:.2f}i",
-                   10)
-
-        pyxel.text(200, 9,
-                   "CHEW TO MATCH THE TARGET C! use mouse (=",
-                   15)
+        pyxel.text(4, 4, f"CURRENT C: {self.c_real:.2f} + {self.c_imag:.2f}i", 7)
+        pyxel.text(self.WIDTH - 70, 4, f"TIME: {self.chew_timer // self.FPS}", 9)
+        pyxel.text(4, 14, f"TARGET C: {self.target_c_real:.2f} + {self.target_c_imag:.2f}i", 10)
+        pyxel.text(200, 9, "CHEW YOUR FOOD, MOVE MOUSE TO MATCH THE TARGET C!!", 15)

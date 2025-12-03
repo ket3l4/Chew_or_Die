@@ -1,13 +1,17 @@
+
 import pyxel
 import random
 import math
+from typing import Tuple
 
 from constants import *
 from dot_manager import DotManager
 from player import Player
 from julia import Julia_set
+import ui
 
 class App:
+
     def __init__(self):
         pyxel.init(WIDTH, HEIGHT, title="Chew or Die", fps=FPS)
 
@@ -89,16 +93,17 @@ class App:
 
         self.dot_manager.update_dots(self.score)
 
+        # Advance player movement
         state, head = self.player.update_movement()
         if state == "COLLISION":
             self.mode = LOSE_MODE
             return
 
         if state == "MOVE":
-            hx,hy = head
+            head_x, head_y = head
 
-            # dots colision
-            penalty = self.dot_manager.check_collision(hx, hy, SEGMENT_SIZE)
+            # dots collision
+            penalty = self.dot_manager.check_collision(head_x, head_y, SEGMENT_SIZE)
             if penalty < 0:
                 self.score += penalty
                 self.sliced_fx_timer = 10
@@ -108,8 +113,8 @@ class App:
                 if self.score <= 0:
                     self.mode = LOSE_MODE
                     
-            #Fruit collision
-            if hx == self.fruit_x and hy == self.fruit_y:
+            # Fruit collision
+            if head_x == self.fruit_x and head_y == self.fruit_y:
                 self.mode = FRACTAL_MODE
                 self.julia.start_timer()
 
@@ -132,22 +137,12 @@ class App:
                 y <= pyxel.mouse_y <= y + BUTTON_H)
 
     def draw_fruit(self, x, y):
-        # red apple
-        pyxel.circ(x + 8, y + 8, 6, 8)
-        # highlight
-        pyxel.circ(x + 5, y + 5, 2, 7)
-        # stem
-        pyxel.rect(x + 7, y + 1, 2, 3, 4)
+        # delegate to ui library
+        ui.draw_fruit(x, y)
 
 
     def draw_button(self, x, y, text, base_color, hover_color):
-        hover = self._btn_hover(x, y)
-        color = hover_color if hover else base_color
-        pyxel.rect(x, y, BUTTON_W, BUTTON_H, color)
-
-        text_x = x + (BUTTON_W - len(text) * 4) // 2
-        text_y = y + (BUTTON_H - 6) // 2
-        pyxel.text(text_x, text_y, text, 0)
+        ui.draw_button(x, y, text, base_color, hover_color)
 
 
     def draw(self):
@@ -160,8 +155,11 @@ class App:
         elif self.mode == LOSE_MODE:
             self.draw_lose()
 
+    def draw_background(self):
+        ui.draw_background(WIDTH, HEIGHT)
+
     def draw_menu(self):
-        pyxel.cls(1)
+        self.draw_background()
         pyxel.text(WIDTH // 2 - 40, 40, "CHEW OR DIE", 7)
 
         cx = WIDTH // 2
@@ -169,11 +167,12 @@ class App:
         gap = 40
         bx = cx - BUTTON_W // 2
 
-        self.draw_button(bx, start_y, "PLAY", 3, 11)
-        self.draw_button(bx, start_y + gap, "EXIT", 9, 2)
+        self.draw_button(bx, start_y, "PLAY", 6, 12)
+        self.draw_button(bx, start_y + gap, "EXIT", 11, 3)
+        pyxel.text(WIDTH // 2 - 170, 50, "SNAKE GAME but... WHEN YOU REACH THE FOOD YOU HAVE TO CHEW UNTIL YOU REACH THE TARGET", 7)
 
     def draw_game(self):
-        pyxel.cls(1)
+        self.draw_background()
 
         self.dot_manager.draw()
         self.draw_fruit(self.fruit_x, self.fruit_y)
@@ -190,11 +189,12 @@ class App:
             self.sliced_fx_timer -= 1
 
     def draw_fractal(self):
+        self.draw_background()
         self.dot_manager.draw()
         self.julia.draw_fractal()
 
     def draw_lose(self):
-        pyxel.cls(9)
+        self.draw_background()
         pyxel.text(WIDTH // 2 - 30, HEIGHT // 2 - 20,
                    "STOMACH ACHE!", 7)
         pyxel.text(WIDTH // 2 - 40, HEIGHT // 2,
