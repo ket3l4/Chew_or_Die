@@ -6,8 +6,7 @@ code can remain focused on game logic.
 
 import pyxel
 from typing import List
-from constants import BACKGROUND_COLORS, BACKGROUND_BAND_HEIGHT, BUTTON_W, BUTTON_H
-
+from constants import BACKGROUND_COLORS, BACKGROUND_BAND_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT
 
 def draw_background(width: int, height: int) -> None:
     colors: List[int] = BACKGROUND_COLORS
@@ -21,13 +20,13 @@ def draw_background(width: int, height: int) -> None:
 
 
 def draw_button(x: int, y: int, text: str, base_color: int, hover_color: int) -> None:
-    hover = (x <= pyxel.mouse_x <= x + BUTTON_W and
-             y <= pyxel.mouse_y <= y + BUTTON_H)
+    hover = (x <= pyxel.mouse_x <= x + BUTTON_WIDTH and
+             y <= pyxel.mouse_y <= y + BUTTON_HEIGHT)
     color = hover_color if hover else base_color
-    pyxel.rect(x, y, BUTTON_W, BUTTON_H, color)
+    pyxel.rect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, color)
 
-    text_x = x + (BUTTON_W - len(text) * 4) // 2
-    text_y = y + (BUTTON_H - 6) // 2
+    text_x = x + (BUTTON_WIDTH - len(text) * 4) // 2
+    text_y = y + (BUTTON_HEIGHT - 6) // 2
     pyxel.text(text_x, text_y, text, 0)
 
 

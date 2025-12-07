@@ -1,5 +1,5 @@
 [project]
-name = "Chew or Die"
+name = "Chew_or_Die"
 version = "0.1.0"
 description = "A Pyxel-based retro arcade game combining snake game mechanics with a Julia set fractal mini-game"
 readme = "README.md"

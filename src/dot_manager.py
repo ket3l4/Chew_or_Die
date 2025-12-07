@@ -7,7 +7,7 @@ with the player head, and exposes simple tuning via difficulty().
 import pyxel
 import random
 import math
-from constants import WIDTH, HEIGHT, BASE_C_REAL
+from constants import APP_WIDTH, APP_HEIGHT, BASE_C_REAL
 
 class DotManager:
     def __init__(self, width, height):

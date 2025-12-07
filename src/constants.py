@@ -1,9 +1,9 @@
 import math
 
 # Pixel constants
-WIDTH = 512
-HEIGHT = 384
-FPS = 30
+APP_WIDTH = 512 #Pyxel screen width
+APP_HEIGHT = 384 #Pyxel screen height
+GAME_FPS = 30
 SEGMENT_SIZE = 16
 
 # Game modes
@@ -26,8 +26,8 @@ FRACTAL_MAX_X = 1.5
 FRACTAL_MIN_Y = -1.5
 FRACTAL_MAX_Y = 1.5
 
-BUTTON_W = 150
-BUTTON_H = 22
+BUTTON_WIDTH = 150
+BUTTON_HEIGHT = 22
 RAINBOW_COLORS = [2,6,12,11,10,14,2]
 
 

@@ -4,26 +4,29 @@ import random
 import math
 from typing import Tuple
 
-from constants import *
+import constants
 from dot_manager import DotManager
 from player import Player
 from julia import Julia_set
 import ui
 
 class App:
-
+    """
+    The main class containing all the logic for the game.
+    """
     def __init__(self):
-        pyxel.init(WIDTH, HEIGHT, title="Chew or Die", fps=FPS)
+        """
 
-        self.mode = MENU_MODE
+        """
+        pyxel.init(constants.APP_WIDTH, constants.APP_HEIGHT, title="Chew or Die", fps=constants.GAME_FPS)
+        self.mode = constants.MENU_MODE
         self.is_sound_on = True
         self.selected_character = 1
 
         pyxel.sound(0).set("c2e2g2c3", "p", "6", "n", 5)
-
-        self.player = Player(WIDTH, HEIGHT, SEGMENT_SIZE, RAINBOW_COLORS)
-        self.dot_manager = DotManager(WIDTH, HEIGHT)
-        self.julia = Julia_set(WIDTH, HEIGHT, FPS, self.dot_manager)
+        self.player = Player(constants.APP_WIDTH, constants.APP_HEIGHT, constants.SEGMENT_SIZE, constants.RAINBOW_COLORS)
+        self.dot_manager = DotManager(constants.APP_WIDTH, constants.APP_HEIGHT)
+        self.julia = Julia_set(constants.APP_WIDTH, constants.APP_HEIGHT, constants.GAME_FPS, self.dot_manager)
 
         self._reset_game_state()
         pyxel.run(self.update, self.draw)
@@ -32,46 +35,44 @@ class App:
         self.score = 5
         self.sliced_fx_timer = 0
 
-        self.player = Player(WIDTH, HEIGHT, SEGMENT_SIZE, RAINBOW_COLORS)
+        self.player = Player(constants.APP_WIDTH, constants.APP_HEIGHT, constants.SEGMENT_SIZE, constants.RAINBOW_COLORS)
         self.dot_manager.dots = []
 
         self.julia.reset_target_c(self.score)
         self.fruit_x, self.fruit_y = self.spawn_fruit(self.player.body)
 
     def spawn_fruit(self, forbidden):
-        grid_w = WIDTH // SEGMENT_SIZE * SEGMENT_SIZE
-        grid_h = HEIGHT // SEGMENT_SIZE * SEGMENT_SIZE
+        grid_w = constants.APP_WIDTH // constants.SEGMENT_SIZE * constants.SEGMENT_SIZE
+        grid_h = constants.APP_HEIGHT // constants.SEGMENT_SIZE * constants.SEGMENT_SIZE
 
         while True:
-            x = random.randrange(0, grid_w, SEGMENT_SIZE)
-            y = random.randrange(0, grid_h, SEGMENT_SIZE)
+            x = random.randrange(0, grid_w, constants.SEGMENT_SIZE)
+            y = random.randrange(0, grid_h, constants.SEGMENT_SIZE)
             if [x, y] not in forbidden:
                 return x, y
-
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
-
-        if self.mode == MENU_MODE:
+        if self.mode == constants.MENU_MODE:
             self.update_menu()
-        elif self.mode == GAME_MODE:
+        elif self.mode == constants.GAME_MODE:
             self.update_game()
-        elif self.mode == FRACTAL_MODE:
+        elif self.mode == constants.FRACTAL_MODE:
             self.update_fractal()
-        elif self.mode == LOSE_MODE:
+        elif self.mode == constants.LOSE_MODE:
             if pyxel.btnp(pyxel.KEY_SPACE):
-                self.mode = MENU_MODE
+                self.mode = constants.MENU_MODE
 
     def update_menu(self):
-        cx = WIDTH // 2
-        start_y = HEIGHT // 2 - 70
+        cx = constants.APP_WIDTH // 2
+        start_y = constants.APP_HEIGHT // 2 - 70
         gap = 40
-        bx = cx - BUTTON_W // 2
+        bx = cx - constants.BUTTON_WIDTH // 2
 
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             if self._btn_hover(bx, start_y):
                 self._reset_game_state()
-                self.mode = GAME_MODE
+                self.mode = constants.GAME_MODE
             elif self._btn_hover(bx, start_y + gap):
                 self.is_sound_on = not self.is_sound_on
             elif self._btn_hover(bx, start_y + gap * 2):
@@ -82,13 +83,13 @@ class App:
     def update_game(self):
         # --- Input
         if pyxel.btnp(pyxel.KEY_UP) or pyxel.btnp(pyxel.KEY_W):
-            self.player.set_direction([0, -SEGMENT_SIZE])
+            self.player.set_direction([0, -constants.SEGMENT_SIZE])
         elif pyxel.btnp(pyxel.KEY_DOWN) or pyxel.btnp(pyxel.KEY_S):
-            self.player.set_direction([0, SEGMENT_SIZE])
+            self.player.set_direction([0, constants.SEGMENT_SIZE])
         elif pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
-            self.player.set_direction([-SEGMENT_SIZE, 0])
+            self.player.set_direction([-constants.SEGMENT_SIZE, 0])
         elif pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
-            self.player.set_direction([SEGMENT_SIZE, 0])
+            self.player.set_direction([constants.SEGMENT_SIZE, 0])
 
 
         self.dot_manager.update_dots(self.score)
@@ -96,14 +97,14 @@ class App:
         # Advance player movement
         state, head = self.player.update_movement()
         if state == "COLLISION":
-            self.mode = LOSE_MODE
+            self.mode = constants.LOSE_MODE
             return
 
         if state == "MOVE":
             head_x, head_y = head
 
             # dots collision
-            penalty = self.dot_manager.check_collision(head_x, head_y, SEGMENT_SIZE)
+            penalty = self.dot_manager.check_collision(head_x, head_y, constants.SEGMENT_SIZE)
             if penalty < 0:
                 self.score += penalty
                 self.sliced_fx_timer = 10
@@ -111,11 +112,11 @@ class App:
                     pyxel.play(0, 0)
 
                 if self.score <= 0:
-                    self.mode = LOSE_MODE
+                    self.mode = constants.LOSE_MODE
                     
             # Fruit collision
             if head_x == self.fruit_x and head_y == self.fruit_y:
-                self.mode = FRACTAL_MODE
+                self.mode = constants.FRACTAL_MODE
                 self.julia.start_timer()
 
     def update_fractal(self):
@@ -123,18 +124,18 @@ class App:
         status = self.julia.update_chewing()
 
         if status == "LOSE":
-            self.mode = LOSE_MODE
+            self.mode = constants.LOSE_MODE
         elif status == "WIN":
             self.player.grow_body()
             self.score += 10
 
             self.fruit_x, self.fruit_y = self.spawn_fruit(self.player.body)
             self.julia.reset_target_c(self.score)
-            self.mode = GAME_MODE
+            self.mode = constants.GAME_MODE
 
     def _btn_hover(self, x, y):
-        return (x <= pyxel.mouse_x <= x + BUTTON_W and
-                y <= pyxel.mouse_y <= y + BUTTON_H)
+        return (x <= pyxel.mouse_x <= x + constants.BUTTON_WIDTH and
+                y <= pyxel.mouse_y <= y + constants.BUTTON_HEIGHT)
 
     def draw_fruit(self, x, y):
         # delegate to ui library
@@ -146,30 +147,30 @@ class App:
 
 
     def draw(self):
-        if self.mode == MENU_MODE:
+        if self.mode == constants.MENU_MODE:
             self.draw_menu()
-        elif self.mode == GAME_MODE:
+        elif self.mode == constants.GAME_MODE:
             self.draw_game()
-        elif self.mode == FRACTAL_MODE:
+        elif self.mode == constants.FRACTAL_MODE:
             self.draw_fractal()
-        elif self.mode == LOSE_MODE:
+        elif self.mode == constants.LOSE_MODE:
             self.draw_lose()
 
     def draw_background(self):
-        ui.draw_background(WIDTH, HEIGHT)
+        ui.draw_background(constants.APP_WIDTH, constants.APP_HEIGHT)
 
     def draw_menu(self):
         self.draw_background()
-        pyxel.text(WIDTH // 2 - 40, 40, "CHEW OR DIE", 7)
+        pyxel.text(constants.APP_WIDTH // 2 - 40, 40, "CHEW OR DIE", 7)
 
-        cx = WIDTH // 2
-        start_y = HEIGHT // 2 - 70
+        cx = constants.APP_WIDTH // 2
+        start_y = constants.APP_HEIGHT // 2 - 70
         gap = 40
-        bx = cx - BUTTON_W // 2
+        bx = cx - constants.BUTTON_WIDTH // 2
 
         self.draw_button(bx, start_y, "PLAY", 6, 12)
         self.draw_button(bx, start_y + gap, "EXIT", 11, 3)
-        pyxel.text(WIDTH // 2 - 170, 50, "SNAKE GAME but... WHEN YOU REACH THE FOOD YOU HAVE TO CHEW UNTIL YOU REACH THE TARGET", 7)
+        pyxel.text(constants.APP_WIDTH // 2 - 170, 50, "SNAKE GAME but... WHEN YOU REACH THE FOOD YOU HAVE TO CHEW UNTIL YOU REACH THE TARGET", 7)
 
     def draw_game(self):
         self.draw_background()
@@ -180,12 +181,12 @@ class App:
         self.player.draw(self.selected_character)
 
         pyxel.text(4, 4, f"SCORE: {self.score}", 7)
-        pyxel.text(4, HEIGHT - 10,
+        pyxel.text(4, constants.APP_HEIGHT - 10,
                    f"DANGER LEVEL = {int(self.dot_manager.dot_radius * self.dot_manager.dot_spawn_interval / 10)}",
                    10)
 
         if self.sliced_fx_timer > 0:
-            pyxel.text(WIDTH // 2 - 30, 20, "-1 SLICE!", 8)
+            pyxel.text(constants.APP_WIDTH // 2 - 30, 20, "-1 SLICE!", 8)
             self.sliced_fx_timer -= 1
 
     def draw_fractal(self):
@@ -195,11 +196,11 @@ class App:
 
     def draw_lose(self):
         self.draw_background()
-        pyxel.text(WIDTH // 2 - 30, HEIGHT // 2 - 20,
+        pyxel.text(constants.APP_WIDTH // 2 - 30, constants.APP_HEIGHT // 2 - 20,
                    "STOMACH ACHE!", 7)
-        pyxel.text(WIDTH // 2 - 40, HEIGHT // 2,
+        pyxel.text(constants.APP_WIDTH // 2 - 40, constants.APP_HEIGHT // 2,
                    f"FINAL SCORE: {self.score}", 7)
-        pyxel.text(WIDTH // 2 - 90, HEIGHT // 2 + 20,
+        pyxel.text(constants.APP_WIDTH // 2 - 90, constants.APP_HEIGHT // 2 + 20,
                    "PRESS SPACE TO RETURN", 7)
 
 App()
