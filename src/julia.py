@@ -8,10 +8,8 @@ The goal of the mini-game is to match a complex constant (C) by mouse and keys.
 import pyxel
 import random
 import math
-from constants import (MAX_ITER, BASE_C_REAL, BASE_C_IMAG, CHEWING_TIME_SECONDS,
-                       FRACTAL_MIN_X, FRACTAL_MAX_X, FRACTAL_MIN_Y, FRACTAL_MAX_Y,
-                       WINNING_TOLERANCE, JULIA_RENDER_STEP, PALETTE_WRAP, PALETTE_OFFSET,
-                       CHEW_TIMER_DECREMENT)
+import constants
+
 
 class Julia_set:
     """Manages the Julia set rendering and the chewing mini-game state."""
@@ -44,7 +42,7 @@ class Julia_set:
 
     def start_timer(self):
         """Starts the countdown timer for the chewing mini-game."""
-        self.chew_timer = CHEWING_TIME_SECONDS * self.FPS
+        self.chew_timer = constants.CHEWING_TIME_SECONDS * self.FPS
 
     def reset_target_c(self, score):
         """Sets a new random target complex constant (C) and resets the player C.
@@ -58,8 +56,8 @@ class Julia_set:
         r = random.uniform(-0.15, 0.15)
         im = random.uniform(-0.15, 0.15)
 
-        self.target_c_real = round(BASE_C_REAL + r, 2)
-        self.target_c_imag = round(BASE_C_IMAG + im, 2)
+        self.target_c_real = round(constants.BASE_C_REAL + r, 2)
+        self.target_c_imag = round(constants.BASE_C_IMAG + im, 2)
         self.target_c = complex(self.target_c_real, self.target_c_imag)
 
         # Update dot difficulty based on the new target C.
@@ -84,7 +82,7 @@ class Julia_set:
             The number of iterations before divergence, or MAX_ITER if it did not diverge.
         """
         n = 0
-        while abs(z) <= 2 and n < MAX_ITER:
+        while abs(z) <= 2 and n < constants.MAX_ITER:
             z = z * z + c
             n += 1
         return n
@@ -95,12 +93,9 @@ class Julia_set:
         Returns:
             A string indicating the game status: "LOSE", "WIN", or "CONTINUE".
         """
-        self.chew_timer -= CHEW_TIMER_DECREMENT
-        # When the chewing timer reaches zero, indicate a timeout rather
-        # than forcing a direct "LOSE" string. The caller (`main.py`) will
-        # apply the penalty and decide whether the game ends.
+        self.chew_timer -= 2
         if self.chew_timer <= 0:
-            return "TIMEOUT"
+            return "LOSE"
 
         # Update C components based on mouse position for a primary control method.
         # Maps screen coordinates (0 to WIDTH/HEIGHT) to a range of approx -1 to 1.
@@ -115,7 +110,7 @@ class Julia_set:
         di = self.c_imag - self.target_c_imag
         dist = math.sqrt(dr * dr + di * di)
 
-        if dist < WINNING_TOLERANCE:
+        if dist < constants.WINNING_TOLERANCE:
             return "WIN"
 
         return "CONTINUE"
@@ -126,21 +121,21 @@ class Julia_set:
         The fractal is drawn at a reduced 2x2 pixel block resolution for performance.
         """
         # Calculate scaling factors to map screen pixels to complex plane coordinates.
-        scale_x = (FRACTAL_MAX_X - FRACTAL_MIN_X) / self.WIDTH
-        scale_y = (FRACTAL_MAX_Y - FRACTAL_MIN_Y) / self.HEIGHT
+        scale_x = (constants.FRACTAL_MAX_X - constants.FRACTAL_MIN_X) / self.WIDTH
+        scale_y = (constants.FRACTAL_MAX_Y - constants.FRACTAL_MIN_Y) / self.HEIGHT
 
-        # Draw at reduced-resolution pixel blocks for performance.
-        step = JULIA_RENDER_STEP
+        # Draw at 2x2 pixel blocks for performance.
+        step = 2
         for x_pixel in range(0, self.WIDTH, step):
             # Calculate the real part corresponding to the x_pixel.
-            real = FRACTAL_MIN_X + x_pixel * scale_x
+            real = constants.FRACTAL_MIN_X + x_pixel * scale_x
             for y_pixel in range(0, self.HEIGHT, step):
                 # Calculate the imaginary part corresponding to the y_pixel.
-                imag = FRACTAL_MIN_Y + y_pixel * scale_y
+                imag = constants.FRACTAL_MIN_Y + y_pixel * scale_y
                 # Calculate the iteration count for the point.
                 iter_count = self.julia_iter(complex(real, imag), self.c_fixed)
                 # Determine color: 0 for MAX_ITER (inside the set), otherwise a colored pattern.
-                color = 0 if iter_count == MAX_ITER else (iter_count % PALETTE_WRAP) + PALETTE_OFFSET
+                color = 0 if iter_count == constants.MAX_ITER else (iter_count % 14) + 2
 
                 # Draw the 2x2 pixel block with the determined color.
                 pyxel.pset(x_pixel, y_pixel, color)

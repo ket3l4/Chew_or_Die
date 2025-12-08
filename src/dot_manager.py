@@ -4,26 +4,13 @@ The DotManager spawns dots, updates their positions, handles collisions
 with the player head, and exposes simple tuning via difficulty().
 """
 
-
-import pyxel
-import random
-import constants
-import math
-"""Manage falling dots (obstacles) used by the main game.
-
-The DotManager spawns dots, updates their positions, handles collisions
-with the player head, and exposes simple tuning via difficulty().
-"""
-
 import pyxel
 import random
 import math
 import constants
-
 
 class DotManager:
     """Manages the generation, movement, and collision of falling obstacle dots."""
-
     def __init__(self, width, height):
         """Initializes the DotManager.
 
@@ -36,9 +23,9 @@ class DotManager:
         # List of dots, where each dot is stored as:
         # [y, speed, color, sliced_flag, base_x, x]
         self.dots = []
-        self.dot_radius = constants.DOT_INITIAL_RADIUS
-        self.dot_spawn_interval = constants.DOT_BASE_SPAWN_INTERVAL
-        self.difficulty_level = 0
+        self.dot_radius = 4  # Initial radius of the dot.
+        self.dot_spawn_interval = 16  # Frames between dot spawns.
+        self.difficulty_level = 0  # Difficulty based on player score.
 
     def difficulty(self, score, target_c_real, target_c_imag):
         """Scales dot properties based on score and the Julia set target C.
@@ -54,21 +41,20 @@ class DotManager:
         D = math.hypot(target_c_real - constants.BASE_C_REAL, target_c_imag)
 
         # Scale D to an integer factor for radius and spawn reduction.
-        scale = int(D * constants.DOT_DISTANCE_SCALE)
+        scale = int(D * 10)
 
-        # Dot radius grows with distance (D) but is clamped to a maximum.
-        self.dot_radius = min(constants.DOT_MAX_RADIUS, 1 + scale)
+        # Dot radius grows with distance (D) but is clamped to a maximum of 3.
+        self.dot_radius = min(3, 1 + scale)
 
-        # Difficulty level increases every DOT_DIFFICULTY_SCORE_STEP points.
-        self.difficulty_level = score // constants.DOT_DIFFICULTY_SCORE_STEP
+        # Difficulty level increases every 30 points.
+        self.difficulty_level = score // 30
 
         # Base spawn interval reduced by difficulty level.
-        base_interval = max(constants.DOT_MIN_BASE_INTERVAL,
-                            constants.DOT_BASE_SPAWN_INTERVAL - self.difficulty_level * 2)
+        base_interval = max(6, 16 - self.difficulty_level * 2)
         # Reduction based on the complex constant distance D.
-        reduction = int(D * constants.DOT_REDUCTION_MULTIPLIER)
-        # Final spawn interval: clamped to a minimum.
-        self.dot_spawn_interval = max(constants.DOT_MIN_SPAWN_INTERVAL, base_interval - reduction)
+        reduction = int(D * 25)
+        # Final spawn interval: clamped to a minimum of 2 frames.
+        self.dot_spawn_interval = max(2, base_interval - reduction)
 
     def update_dots(self, score):
         """Spawns new dots and updates the position of existing dots.
@@ -76,8 +62,8 @@ class DotManager:
         Args:
             score: The player's current score, used to check for spawn condition.
         """
-        # Spawn new dot periodically once the player has reached the configured threshold.
-        if score >= constants.SCORE_DOT_SPAWN_THRESHOLD and pyxel.frame_count % self.dot_spawn_interval == 0:
+        # Spawn new dot periodically once the player has a score of 10 or more.
+        if score >= 10 and pyxel.frame_count % self.dot_spawn_interval == 0:
             speed = random.uniform(1.0, 3.0)
             color = random.randint(2, 15)
             base_x = random.randint(0, self.WIDTH - 1)

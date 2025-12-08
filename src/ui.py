@@ -6,7 +6,8 @@ code can remain focused on game logic. It relies on the global pyxel state.
 
 import pyxel
 from typing import List
-from constants import BACKGROUND_COLORS, BACKGROUND_BAND_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT
+import constants
+
 
 def draw_background(width: int, height: int) -> None:
     """Draws a vertical gradient background using defined colors.
@@ -15,11 +16,10 @@ def draw_background(width: int, height: int) -> None:
 
     Args:
         width: The width of the screen.
-        import pyxel
-        from constants import MENU_BUTTON_GAP
+        height: The height of the screen.
     """
-    colors: List[int] = BACKGROUND_COLORS
-    band_height = BACKGROUND_BAND_HEIGHT
+    colors: List[int] = constants.BACKGROUND_COLORS
+    band_height = constants.BACKGROUND_BAND_HEIGHT
 
     for y in range(0, height, band_height):
         # Calculate a normalized value 't' (0.0 to 1.0) for the current y position.
@@ -41,23 +41,27 @@ def draw_button(x: int, y: int, text: str, base_color: int, hover_color: int) ->
         hover_color: The color index to use when the mouse is hovering over the button.
     """
     # Check if the mouse cursor is within the button boundaries.
-    hover = (x <= pyxel.mouse_x <= x + BUTTON_WIDTH and
-             y <= pyxel.mouse_y <= y + BUTTON_HEIGHT)
+    hover = (x <= pyxel.mouse_x <= x + constants.BUTTON_WIDTH and
+             y <= pyxel.mouse_y <= y + constants.BUTTON_HEIGHT)
     color = hover_color if hover else base_color
-    pyxel.rect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, color)
+    pyxel.rect(x, y, constants.BUTTON_WIDTH, constants.BUTTON_HEIGHT, color)
 
     # Calculate the position to center the text on the button.
-    text_x = x + (BUTTON_WIDTH - len(text) * 4) // 2
-    text_y = y + (BUTTON_HEIGHT - 6) // 2
+    # Text width is length * 4 pixels.
+    text_x = x + (constants.BUTTON_WIDTH - len(text) * 4) // 2
+    # Text height is 6 pixels.
+    text_y = y + (constants.BUTTON_HEIGHT - 6) // 2
     pyxel.text(text_x, text_y, text, 0) # Text color is always 0 (black/dark)
+
 
 def draw_fruit(x: int, y: int) -> None:
     """Draws the fruit (food) on the screen as a simple circle with a stem.
 
     AI Generated
+    
     Args:
         x: The X coordinate of the top-left corner of the fruit's segment.
-            text_x = x + (BUTTON_WIDTH - len(text) * 4) // 2
+        y: The Y coordinate of the top-left corner of the fruit's segment.
     """
     # Main fruit body (large circle, color 8)
     pyxel.circ(x + 8, y + 8, 6, 8)
