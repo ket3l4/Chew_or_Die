@@ -7,7 +7,7 @@ and drawing of the body and head.
 import pyxel
 import ui
 from typing import List, Tuple
-from constants import RAINBOW_COLORS
+import constants
 
 
 class Player:
@@ -25,7 +25,7 @@ class Player:
         self.HEIGHT = height
         self.SEGMENT_SIZE = size
         # Use provided colors or the default from constants.
-        self.RAINBOW_COLORS = rainbow_colors if rainbow_colors is not None else RAINBOW_COLORS
+        self.RAINBOW_COLORS = rainbow_colors if rainbow_colors is not None else constants.RAINBOW_COLORS
 
         # Initialize player body with three segments near the center.
         start_x = width // 2
@@ -38,7 +38,7 @@ class Player:
 
         self.direction: List[int] = [size, 0]  # Initial movement is to the right.
         self.move_counter = 0
-        self.move_speed = 5  # Controls how many frames pass before the snake moves.
+        self.move_speed = constants.PLAYER_MOVE_SPEED  # Controls how many frames pass before the snake moves.
 
     def set_direction(self, d: Tuple[int, int]) -> None:
         """Sets the player's movement direction.

@@ -37,8 +37,9 @@ class App:
 
     def _reset_game_state(self):
         """Resets all game-specific variables for a new game."""
-        self.score = 5
+        self.score = constants.INITIAL_SCORE
         self.sliced_fx_timer = 0  # Timer for the '-1 SLICE!' text effect.
+        self.stomachache_timer = 0  # Timer for the 'STOMACH ACHE! -4' penalty text.
 
         # Re-initialize player and clear dots.
         self.player = Player(constants.APP_WIDTH, constants.APP_HEIGHT, constants.SEGMENT_SIZE, constants.RAINBOW_COLORS)
@@ -90,7 +91,7 @@ class App:
         """Handles input and logic for the main menu screen."""
         cx = constants.APP_WIDTH // 2
         start_y = constants.APP_HEIGHT // 2 - 70
-        gap = 40
+        gap = constants.MENU_BUTTON_GAP
         bx = cx - constants.BUTTON_WIDTH // 2
 
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
@@ -124,6 +125,13 @@ class App:
 
         self.dot_manager.update_dots(self.score)
 
+        # Adjust player speed based on current difficulty level (lower move_speed = faster)
+        new_speed = max(
+            constants.PLAYER_MIN_MOVE_SPEED,
+            constants.PLAYER_MOVE_SPEED - self.dot_manager.difficulty_level * constants.PLAYER_SPEED_DECREASE_PER_LEVEL,
+        )
+        self.player.move_speed = new_speed
+
         # Advance player movement.
         state, head = self.player.update_movement()
         if state == "COLLISION":
@@ -137,7 +145,7 @@ class App:
             penalty = self.dot_manager.check_collision(head_x, head_y, constants.SEGMENT_SIZE)
             if penalty < 0:
                 self.score += penalty
-                self.sliced_fx_timer = 10  # Start visual effect timer.
+                self.sliced_fx_timer = constants.SLICED_FX_DURATION  # Start visual effect timer.
                 if self.is_sound_on:
                     pyxel.play(0, 0)
 
@@ -154,10 +162,19 @@ class App:
         """Handles input and logic for the chewing mini-game (FRACTAL_MODE)."""
         self.dot_manager.update_dots(self.score) # Dots continue to fall for increased difficulty.
         status = self.julia.update_chewing()
-
-        if status == "LOSE":
-            # Timer ran out in the fractal game.
-            self.mode = constants.LOSE_MODE
+        if status == "LOSE" or status == "TIMEOUT":
+            # Timer ran out in the fractal game. Penalize the player by the configured constant.
+            self.score -= constants.FRACTAL_TIMEOUT_PENALTY
+            # If score falls to zero or below, go to the lose screen.
+            if self.score <= 0:
+                self.mode = constants.LOSE_MODE
+                return
+            # Show a short "stomachache" penalty text when timing out.
+            self.stomachache_timer = constants.STOMACHACHE_DURATION
+            # Otherwise, reset fractal target and respawn fruit, return to game.
+            self.fruit_x, self.fruit_y = self.spawn_fruit(self.player.body)
+            self.julia.reset_target_c(self.score)
+            self.mode = constants.GAME_MODE
         elif status == "WIN":
             # Successfully matched the target C.
             self.player.grow_body() # Grow the snake as a reward.
@@ -245,6 +262,10 @@ class App:
         if self.sliced_fx_timer > 0:
             pyxel.text(constants.APP_WIDTH // 2 - 30, 20, "-1 SLICE!", 8)
             self.sliced_fx_timer -= 1
+        # Draw the stomachache penalty when applicable.
+        if getattr(self, 'stomachache_timer', 0) > 0:
+            pyxel.text(constants.APP_WIDTH // 2 - 48, 32, f"STOMACH ACHE! -{constants.FRACTAL_TIMEOUT_PENALTY}", 8)
+            self.stomachache_timer -= 1
 
     def draw_fractal(self):
         """Draws the chewing mini-game (FRACTAL_MODE) screen."""

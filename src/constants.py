@@ -24,6 +24,10 @@ FRACTAL_MAX_X = 1.5
 FRACTAL_MIN_Y = -1.5
 FRACTAL_MAX_Y = 1.5
 
+# --- Penalties ---
+# Points subtracted when the chewing mini-game times out (use positive integer)
+FRACTAL_TIMEOUT_PENALTY = 4
+
 # --- UI Constants ---
 BUTTON_WIDTH = 150
 BUTTON_HEIGHT = 22
@@ -31,3 +35,33 @@ RAINBOW_COLORS = [2, 6, 12, 11, 10, 14, 2]  # Colors used for the snake's body s
 
 BACKGROUND_COLORS = [2, 14, 10, 11, 12, 6, 2]  # Colors used to draw the background gradient.
 BACKGROUND_BAND_HEIGHT = 6  # Height of each color band in the background gradient.
+
+# --- Gameplay tuning ---
+INITIAL_SCORE = 5  # Starting player score
+PLAYER_MOVE_SPEED = 8  # Frames per movement for the player
+PLAYER_SPEED_DECREASE_PER_LEVEL = 1  # How many frames to reduce per difficulty level
+PLAYER_MIN_MOVE_SPEED = 1  # Minimum frames per movement (fastest)
+
+# --- Dot (obstacle) tuning ---
+DOT_INITIAL_RADIUS = 4
+DOT_BASE_SPAWN_INTERVAL = 16
+DOT_MIN_BASE_INTERVAL = 6
+DOT_MIN_SPAWN_INTERVAL = 2
+DOT_DISTANCE_SCALE = 10
+DOT_REDUCTION_MULTIPLIER = 25
+DOT_MAX_RADIUS = 12
+SCORE_DOT_SPAWN_THRESHOLD = 10
+
+# Spawn difficulty scaling: every N points difficulty level increases
+DOT_DIFFICULTY_SCORE_STEP = 15
+
+# --- UI / Timing ---
+MENU_BUTTON_GAP = 40
+SLICED_FX_DURATION = 15  # Frames to display '-1 SLICE!'
+STOMACHACHE_DURATION = GAME_FPS  # Frames to display stomachache penalty (1 second)
+
+# --- Julia rendering tuning ---
+JULIA_RENDER_STEP = 2  # Render at 2x2 pixel blocks for performance
+PALETTE_WRAP = 14
+PALETTE_OFFSET = 2
+CHEW_TIMER_DECREMENT = 1

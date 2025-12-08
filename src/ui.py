@@ -15,7 +15,8 @@ def draw_background(width: int, height: int) -> None:
 
     Args:
         width: The width of the screen.
-        height: The height of the screen.
+        import pyxel
+        from constants import MENU_BUTTON_GAP
     """
     colors: List[int] = BACKGROUND_COLORS
     band_height = BACKGROUND_BAND_HEIGHT
@@ -46,21 +47,17 @@ def draw_button(x: int, y: int, text: str, base_color: int, hover_color: int) ->
     pyxel.rect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, color)
 
     # Calculate the position to center the text on the button.
-    # Text width is length * 4 pixels.
     text_x = x + (BUTTON_WIDTH - len(text) * 4) // 2
-    # Text height is 6 pixels.
     text_y = y + (BUTTON_HEIGHT - 6) // 2
     pyxel.text(text_x, text_y, text, 0) # Text color is always 0 (black/dark)
-
 
 def draw_fruit(x: int, y: int) -> None:
     """Draws the fruit (food) on the screen as a simple circle with a stem.
 
     AI Generated
-    
     Args:
         x: The X coordinate of the top-left corner of the fruit's segment.
-        y: The Y coordinate of the top-left corner of the fruit's segment.
+            text_x = x + (BUTTON_WIDTH - len(text) * 4) // 2
     """
     # Main fruit body (large circle, color 8)
     pyxel.circ(x + 8, y + 8, 6, 8)
