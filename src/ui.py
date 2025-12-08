@@ -81,8 +81,11 @@ def draw_head(x: int, y: int, size: int) -> None:
         size: The side length of the head segment (e.g., SEGMENT_SIZE).
     """
 
-    # Head base (square, color 6)
-    pyxel.rect(x, y, size, size, 6)
+    # Head base (square, color 11)
+    pyxel.rect(x, y, size, size, 11)
+
+    # mouth (orange/brown rectangle, color 9)
+    pyxel.rect(x + 3, y + 6, 12, 9, 9)
 
     # Eyes (white rectangles, color 7)
     pyxel.rect(x + 3, y + 4, 6, 6, 7)
@@ -91,5 +94,3 @@ def draw_head(x: int, y: int, size: int) -> None:
     pyxel.pset(x + 5, y + 6, 0)
     pyxel.pset(x + 11, y + 6, 0)
 
-    # Nose (orange/brown rectangle, color 9)
-    pyxel.rect(x + 6, y + 9, 4, 2, 9)

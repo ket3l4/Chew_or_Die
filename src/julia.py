@@ -94,7 +94,7 @@ class Julia_set:
         Returns:
             A string indicating the game status: "LOSE", "WIN", or "CONTINUE".
         """
-        self.chew_timer -= 1
+        self.chew_timer -= 2
         if self.chew_timer <= 0:
             return "LOSE"
 

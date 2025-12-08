@@ -239,7 +239,7 @@ class App:
         danger_level = int(self.dot_manager.dot_radius * self.dot_manager.dot_spawn_interval / 10)
         pyxel.text(4, constants.APP_HEIGHT - 10,
                    f"DANGER LEVEL = {danger_level}",
-                   10)
+                   7)
 
         # Draw the sliced/penalty effect text.
         if self.sliced_fx_timer > 0:
@@ -256,11 +256,11 @@ class App:
         """Draws the game over (LOSE_MODE) screen."""
         self.draw_background()
         pyxel.text(constants.APP_WIDTH // 2 - 30, constants.APP_HEIGHT // 2 - 20,
-                   "STOMACH ACHE!", 7)
-        pyxel.text(constants.APP_WIDTH // 2 - 40, constants.APP_HEIGHT // 2,
-                   f"FINAL SCORE: {self.score}", 7)
-        pyxel.text(constants.APP_WIDTH // 2 - 90, constants.APP_HEIGHT // 2 + 20,
-                   "PRESS SPACE TO RETURN", 7)
+                   "STOMACH ACHE! X w X", 1)
+        pyxel.text(constants.APP_WIDTH // 2 - 30, constants.APP_HEIGHT // 2,
+                   f"SCORE: {self.score}", 1)
+        pyxel.text(constants.APP_WIDTH // 2 - 30, constants.APP_HEIGHT // 2 + 20,
+                   "PRESS SPACE TO RETURN", 1)
 
 # Start the application.
 App()
