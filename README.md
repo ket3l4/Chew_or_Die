@@ -2,7 +2,7 @@
 ![Game Screen](./assets/game_mode.png)
 ![Fractal Screen](./assets/fractal_mode.png)
 
-**Chew or Die** is a Pyxel-based retro arcade game combining snake game mechanics but you have to chew to reach a target with a Julia set fractal mini-game. 
+**Chew or Die** is a Pyxel-based retro arcade game combining snake game mechanics with a Julia set fractal mini-game where you have to move your mouse to reach a target C value (chewing simulation). 
 
 ### Architecture
 The game uses a **state machine pattern** with four distinct modes:
