@@ -11,7 +11,7 @@ import math
 import constants
 
 
-class Julia_set:
+class JuliaSet:
     """Manages the Julia set rendering and the chewing mini-game state."""
     def __init__(self, width, height, fps, dot_manager):
         """Initializes the Julia_set object.

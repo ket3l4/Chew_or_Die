@@ -13,7 +13,7 @@ import constants
 import ui
 from dot_manager import DotManager
 from player import Player
-from julia import Julia_set
+from julia import JuliaSet
 
 class App:
     """The main class containing all the logic for the game."""
@@ -82,7 +82,7 @@ class App:
             with open("highscore.txt", "a") as f:
                 f.write(str(self.score) + "\n")
         except Exception:
-            # If something goes wrong, just ignore it.
+            # If something goes wrong, it is ignored.
             pass
 
     def load_highscores(self):
@@ -103,6 +103,7 @@ class App:
                             # Ignore malformed lines.
                             continue
         except FileNotFoundError:
+            # Returns blank dictionary when FileNotFoundError raised.
             self.highscores = {}
             return
 
@@ -341,6 +342,7 @@ class App:
         self.draw_background()
         self.dot_manager.draw() # Still draw dots in the background.
         self.julia.draw_fractal()
+
     def draw_highscores(self):
         """Draw the highscores 'screen' on top of the menu."""
         # Fill the whole screen with a solid color to hide menu buttons.
