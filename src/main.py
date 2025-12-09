@@ -10,10 +10,10 @@ import random
 from typing import Tuple
 
 import constants
+import ui
 from dot_manager import DotManager
 from player import Player
 from julia import Julia_set
-import ui
 
 class App:
     """The main class containing all the logic for the game."""
@@ -31,7 +31,13 @@ class App:
         self.dot_manager = DotManager(constants.APP_WIDTH, constants.APP_HEIGHT)
         self.julia = Julia_set(constants.APP_WIDTH, constants.APP_HEIGHT, constants.GAME_FPS, self.dot_manager)
 
+        # Setup for loading and displaying highscores.
+        self.highscores = {}
+        self.show_highscores = False
+
         self._reset_game_state()
+        # Read highscores from highscore.txt
+        self.load_highscores()
         # Start the main Pyxel game loop.
         pyxel.run(self.update, self.draw)
 
@@ -70,6 +76,48 @@ class App:
             if [x, y] not in forbidden:
                 return x, y
 
+    def save_score(self):
+        """Append the current score to the highscore file."""
+        try:
+            with open("highscore.txt", "a") as f:
+                f.write(str(self.score) + "\n")
+        except Exception:
+            # If something goes wrong, just ignore it.
+            pass
+
+    def load_highscores(self):
+        """
+        Load scores from the file and store them in a dict:
+        {1: highest_score, 2: next_highest, ...}
+        """
+        scores = []
+        try:
+            with open("highscore.txt", "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        try:
+                            value = int(line)
+                            scores.append(value)
+                        except ValueError:
+                            # Ignore malformed lines.
+                            continue
+        except FileNotFoundError:
+            self.highscores = {}
+            return
+
+        # Sort descending so key 1 is the best score.
+        scores.sort(reverse=True)
+        # Use dictionary comprehension to update instance attribute.
+        self.highscores = {i + 1: score for i, score in enumerate(scores)}
+
+    def handle_game_over(self):
+        """Store the score, refresh highscores, and switch to lose screen.
+        Encompasses several methods - necessary after adding the highscore function."""
+        self.save_score()
+        self.load_highscores()
+        self.mode = constants.LOSE_MODE
+
     def update(self):
         """The main update method, called every frame."""
         # Global quit key.
@@ -94,6 +142,13 @@ class App:
         gap = constants.MENU_BUTTON_GAP
         bx = cx - constants.BUTTON_WIDTH // 2
 
+        # If we are currently looking at the HIGHSCORERS "screen":
+        if self.show_highscores:
+            # SPACE returns to the normal menu.
+            if pyxel.btnp(pyxel.KEY_SPACE):
+                self.show_highscores = False
+            return
+
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             # Check for button clicks using a private helper.
             if self._btn_hover(bx, start_y):
@@ -101,14 +156,18 @@ class App:
                 self._reset_game_state()
                 self.mode = constants.GAME_MODE
             elif self._btn_hover(bx, start_y + gap):
-                # SOUND button (currently unused in draw_menu)
-                self.is_sound_on = not self.is_sound_on
+                # Toggle the highscore panel; always pressable
+                self.show_highscores = True
+                self.load_highscores()
             elif self._btn_hover(bx, start_y + gap * 2):
-                # Placeholder for character select button (currently unused)
-                self.selected_character = 1
-            elif self._btn_hover(bx, start_y + gap * 3):
                 # EXIT button
                 pyxel.quit()
+            elif self._btn_hover(bx, start_y + gap * 3 ):
+                # SOUND button (currently unused in draw_menu)
+                self.is_sound_on = not self.is_sound_on
+            elif self._btn_hover(bx, start_y + gap * 4):
+                # Placeholder for character select button (currently unused)
+                self.selected_character = 1
 
     def update_game(self):
         """Handles input and logic for the main snake gameplay loop."""
@@ -135,7 +194,7 @@ class App:
         # Advance player movement.
         state, head = self.player.update_movement()
         if state == "COLLISION":
-            self.mode = constants.LOSE_MODE
+            self.handle_game_over()
             return
 
         if state == "MOVE":
@@ -150,7 +209,7 @@ class App:
                     pyxel.play(0, 0)
 
                 if self.score <= 0:
-                    self.mode = constants.LOSE_MODE
+                    self.handle_game_over()
                     
             # --- Fruit Collision ---
             if head_x == self.fruit_x and head_y == self.fruit_y:
@@ -167,7 +226,7 @@ class App:
             self.score -= constants.FRACTAL_TIMEOUT_PENALTY
             # If score falls to zero or below, go to the lose screen.
             if self.score <= 0:
-                self.mode = constants.LOSE_MODE
+                self.handle_game_over()
                 return
             # Show a short "stomachache" penalty text when timing out.
             self.stomachache_timer = constants.STOMACHACHE_DURATION
@@ -236,10 +295,20 @@ class App:
 
         # Draw buttons.
         self.draw_button(bx, start_y, "PLAY", 6, 12)
-        self.draw_button(bx, start_y + gap, "EXIT", 11, 3)
+        self.draw_button(bx, start_y + gap, "HIGHSCORE", 13, 10)
+        self.draw_button(bx, start_y + gap * 2, "EXIT", 11, 3)
 
-        # Game description.
-        pyxel.text(constants.APP_WIDTH // 2 - 170, 50, "SNAKE GAME with CHEWING MINI-GAME (uses Julia Set Fractal simulator)", 7)
+        # Highscore panel (always available, but only shown when toggled on).
+        if self.show_highscores:
+            self.draw_highscores()
+        else:
+            # Normal description only when not in highscore screen.
+            pyxel.text(
+                constants.APP_WIDTH // 2 - 170,
+                50,
+                "SNAKE GAME with CHEWING MINI-GAME (uses Julia Set Fractal simulator)",
+                7,
+            )
 
     def draw_game(self):
         """Draws the main gameplay screen."""
@@ -272,6 +341,27 @@ class App:
         self.draw_background()
         self.dot_manager.draw() # Still draw dots in the background.
         self.julia.draw_fractal()
+    def draw_highscores(self):
+        """Draw the highscores 'screen' on top of the menu."""
+        # Fill the whole screen with a solid color to hide menu buttons.
+        pyxel.rect(0, 0, constants.APP_WIDTH, constants.APP_HEIGHT, 13)
+
+        left = 20
+        top = 30
+
+        pyxel.text(left, top, "HIGHSCORES", 7)
+
+        if not self.highscores:
+            pyxel.text(left, top + 12, "No highscores yet ):", 7)
+        else:
+            max_entries = 10
+            for rank in range(1, min(len(self.highscores), max_entries) + 1):
+                score = self.highscores.get(rank, 0)
+                pyxel.text(left, top + 12 + rank * 10, f"{rank}. {score}", 7)
+
+        pyxel.text(left, top + 140, "PRESS SPACE TO RETURN", 7)
+
+
 
     def draw_lose(self):
         """Draws the game over (LOSE_MODE) screen."""
