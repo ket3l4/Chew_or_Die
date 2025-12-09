@@ -15,7 +15,7 @@ MAX_ITER = 40  # Maximum number of iterations for the Julia set calculation.
 BASE_C_REAL = -0.5  # Baseline real component for the complex constant c.
 BASE_C_IMAG = 0.0  # Baseline imaginary component for the complex constant c.
 DIFFICULTY_BASELINE_C = complex(BASE_C_REAL, BASE_C_IMAG)  # The base complex constant for difficulty scaling.
-WINNING_TOLERANCE = 0.02  # Maximum distance between current C and target C to win the chewing game.
+WINNING_TOLERANCE = 0.015  # Maximum distance between current C and target C to win the chewing game.
 CHEWING_TIME_SECONDS = 10  # Duration of the chewing mini-game in seconds.
 
 # Julia set bounds for mapping pixels to the complex plane (Z-plane)
@@ -38,7 +38,7 @@ BACKGROUND_BAND_HEIGHT = 6  # Height of each color band in the background gradie
 
 # --- Gameplay tuning ---
 INITIAL_SCORE = 5  # Starting player score
-PLAYER_MOVE_SPEED = 8  # Frames per movement for the player
+PLAYER_MOVE_SPEED = 10  # Frames per movement for the player
 PLAYER_SPEED_DECREASE_PER_LEVEL = 1  # How many frames to reduce per difficulty level
 PLAYER_MIN_MOVE_SPEED = 1  # Minimum frames per movement (fastest)
 
@@ -49,7 +49,7 @@ DOT_MIN_BASE_INTERVAL = 6
 DOT_MIN_SPAWN_INTERVAL = 2
 DOT_DISTANCE_SCALE = 10
 DOT_REDUCTION_MULTIPLIER = 25
-DOT_MAX_RADIUS = 12
+DOT_MAX_RADIUS = 20
 SCORE_DOT_SPAWN_THRESHOLD = 10
 
 # Spawn difficulty scaling: every N points difficulty level increases
@@ -64,4 +64,4 @@ STOMACHACHE_DURATION = GAME_FPS  # Frames to display stomachache penalty (1 seco
 JULIA_RENDER_STEP = 2  # Render at 2x2 pixel blocks for performance
 PALETTE_WRAP = 14
 PALETTE_OFFSET = 2
-CHEW_TIMER_DECREMENT = 1
+CHEW_TIMER_DECREMENT = 2
