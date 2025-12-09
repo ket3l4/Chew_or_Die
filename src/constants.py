@@ -62,6 +62,6 @@ STOMACHACHE_DURATION = GAME_FPS  # Frames to display stomachache penalty (1 seco
 
 # --- Julia rendering tuning ---
 JULIA_RENDER_STEP = 2  # Render at 2x2 pixel blocks for performance
-PALETTE_WRAP = 14
+PALETTE_WRAP = 16
 PALETTE_OFFSET = 2
 CHEW_TIMER_DECREMENT = 2
