@@ -51,7 +51,6 @@ class JuliaSet:
 
         The target C is set near the BASE_C constants with a small random offset.
 
-        Args:
             score: The player's current score, used for dot difficulty.
         """
         # Random offsets for the target C components.
@@ -133,20 +132,23 @@ class JuliaSet:
             # Calculate the real part corresponding to the x_pixel.
             real = FRACTAL_MIN_X + x_pixel * scale_x
             for y_pixel in range(0, self.HEIGHT, step):
-                # Calculate the imaginary part corresponding to the y_pixel.
+                # Calculate imaginary part corresponding to the y_pixel.
                 imag = FRACTAL_MIN_Y + y_pixel * scale_y
                 # Calculate the iteration count for the point.
                 iter_count = self.julia_iter(complex(real, imag), self.c_fixed)
-                # Determine color: 0 for MAX_ITER (inside the set), otherwise a colored pattern.
-                color = 0 if iter_count == MAX_ITER else (iter_count % PALETTE_WRAP) + PALETTE_OFFSET
+                # Determine colored pattern and assign to `color`.
+                if iter_count == MAX_ITER:
+                    color = 0
+                else:
+                    color = (iter_count % PALETTE_WRAP) + PALETTE_OFFSET
 
-                # Draw the 2x2 pixel block with the determined color.
+                # Draw 2x2 pixel block with colors.
                 pyxel.pset(x_pixel, y_pixel, color)
                 pyxel.pset(x_pixel + 1, y_pixel, color)
                 pyxel.pset(x_pixel, y_pixel + 1, color)
                 pyxel.pset(x_pixel + 1, y_pixel + 1, color)
 
-        # --- HUD overlay showing current/target C and remaining time ---
+        # HUD overlay
         pyxel.rect(0, 0, self.WIDTH, 24, 0)
         pyxel.text(4, 4, f"CURRENT C: {self.c_real:.2f} + {self.c_imag:.2f}i", 7)
         # Display time remaining.
