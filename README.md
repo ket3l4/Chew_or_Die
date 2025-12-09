@@ -4,6 +4,9 @@
 
 **Chew or Die** is a Pyxel-based retro arcade game combining snake game mechanics with a Julia set fractal mini-game where you have to move your mouse to reach a target C value (chewing simulation). 
 
+### Presentation
+- [Canva](https://www.canva.com/design/DAG6bXMqrnE/_RlY10UudBhUYTRWOWTY4Q/edit?utm_content=DAG6bXMqrnE&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
 ### Architecture
 The game uses a **state machine pattern** with four distinct modes:
 - `MENU_MODE` (0): Main menu with buttons
@@ -16,7 +19,7 @@ The game uses a **state machine pattern** with four distinct modes:
 2. **`Player` class**: Snake-like entity with direction-based movement, wrapping edges (see `update_movement`)
 3. **`DotManager` class**: Spawns and manages falling obstacle dots; difficulty scales with score
 4. **`JuliaSet` class**: Renders Julia set fractal and handles fractal mini-game logic
-5. **`ui` class**: Renders illustration of objects
+5. **`ui` class**: Renders most illustrations of the game
 
 ## Critical Patterns & Conventions
 
@@ -42,31 +45,32 @@ Difficulty is driven by **score** and **distance from base Julia constant**
 ### Julia Set & Complex Math
 - Target complex number varies per fruit: `c = BASE_C + offset` where offset is ±0.15 in real/imaginary parts
 - Iteration function: `z = z*z + c` (standard Mandelbrot-variant formula)
-- Color mapping: `color = (iteration_count % 14) + 2` (14 is Pyxel palette limit)
+- Color mapping: `color = (iteration_count % 14) + 2`
 - **Performance note**: Fractal is rendered at 2x2 pixel step to reduce lag
 
 ### Input Handling
 - **Game mode**: Arrow keys for movement; direction changes only if not 180° reversal
 - **Menu**: Mouse click detection via `_btn_hover()` utility
-
+- **Fractal Manipulation**: Mouse / Touchpad / touchscreen
 ### Running the Game
-1. Create a virtual environment (venv)
+1. Download the zip file and extract the game folder from it
+2. Go to the folder directory in Terminal and create a virtual environment (venv)
 ```bash
 python3 -m venv .venv
 ```
-2. Activate virtual environment
+3. Activate virtual environment
 ```bash
 source .venv/bin/activate
 ```
-3. Download pyxel into venv
+4. Download pyxel into venv
 ```bash
 pip install pyxel
 ```
-4. Run the main.py file
+5. Run the main.py file
 ```bash
 python3 main.py
 ```
-or if you have only version of python installed:
+or if you have only 1 version of python installed:
 ```bash
 python main.py
 ```
@@ -83,6 +87,9 @@ python main.py
 - Text positioning is manual (x, y offsets); use `WIDTH // 2` for centering
 - Palette: Pyxel colors 0-15; "RAINBOW_COLORS" array defines snake segment progression
 
-## Known Quirks & TODOs
-- "why does time lag when resolution is good ToT" — 2x2 pixel step is performance trade-off
+## TODOs
+- Make Player collision detection better
+- Make fractal simulation less laggy
+- Insert custom font style to have font size options.
+- Manually draw illustrations using Pyxel's built-in drawing program
 

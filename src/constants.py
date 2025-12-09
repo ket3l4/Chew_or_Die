@@ -30,7 +30,7 @@ FRACTAL_TIMEOUT_PENALTY = 4
 
 # --- UI Constants ---
 BUTTON_WIDTH = 150
-BUTTON_HEIGHT = 22
+BUTTON_HEIGHT = 40
 RAINBOW_COLORS = [2, 6, 12, 11, 10, 14, 2]  # Colors used for the snake's body segments.
 
 BACKGROUND_COLORS = [2, 14, 10, 11, 12, 6, 2]  # Colors used to draw the background gradient.
@@ -64,4 +64,4 @@ STOMACHACHE_DURATION = GAME_FPS  # Frames to display stomachache penalty (1 seco
 JULIA_RENDER_STEP = 2  # Render at 2x2 pixel blocks for performance
 PALETTE_WRAP = 14
 PALETTE_OFFSET = 2
-CHEW_TIMER_DECREMENT = 2
+CHEW_TIMER_DECREMENT = 3

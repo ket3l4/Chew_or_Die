@@ -29,7 +29,7 @@ class App:
         # Initialize game objects.
         self.player = Player(constants.APP_WIDTH, constants.APP_HEIGHT, constants.SEGMENT_SIZE, constants.RAINBOW_COLORS)
         self.dot_manager = DotManager(constants.APP_WIDTH, constants.APP_HEIGHT)
-        self.julia = Julia_set(constants.APP_WIDTH, constants.APP_HEIGHT, constants.GAME_FPS, self.dot_manager)
+        self.julia = JuliaSet(constants.APP_WIDTH, constants.APP_HEIGHT, constants.GAME_FPS, self.dot_manager)
 
         # Setup for loading and displaying highscores.
         self.highscores = {}
@@ -287,17 +287,17 @@ class App:
     def draw_menu(self):
         """Draws the main menu screen."""
         self.draw_background()
-        pyxel.text(constants.APP_WIDTH // 2 - 40, 40, "CHEW OR DIE", 7) # Title
+        pyxel.text(constants.APP_WIDTH // 2 - 40, 40, "C H E W   O R   D I E", 7) # Title
 
         cx = constants.APP_WIDTH // 2
-        start_y = constants.APP_HEIGHT // 2 - 70
+        start_y = constants.APP_HEIGHT // 2 - 90
         gap = 40
         bx = cx - constants.BUTTON_WIDTH // 2
 
         # Draw buttons.
-        self.draw_button(bx, start_y, "PLAY", 6, 12)
-        self.draw_button(bx, start_y + gap, "HIGHSCORE", 13, 10)
-        self.draw_button(bx, start_y + gap * 2, "EXIT", 11, 3)
+        self.draw_button(bx, start_y, "P L A Y", 8, 10)
+        self.draw_button(bx, start_y + gap, "H I G H S C O R E", 9, 11)
+        self.draw_button(bx, start_y + gap * 2, "E X I T", 10, 12)
 
         # Highscore panel (always available, but only shown when toggled on).
         if self.show_highscores:
@@ -305,7 +305,7 @@ class App:
         else:
             # Normal description only when not in highscore screen.
             pyxel.text(
-                constants.APP_WIDTH // 2 - 170,
+                constants.APP_WIDTH // 2 - 140,
                 50,
                 "SNAKE GAME with CHEWING MINI-GAME (uses Julia Set Fractal simulator)",
                 7,
@@ -346,22 +346,22 @@ class App:
     def draw_highscores(self):
         """Draw the highscores 'screen' on top of the menu."""
         # Fill the whole screen with a solid color to hide menu buttons.
-        pyxel.rect(0, 0, constants.APP_WIDTH, constants.APP_HEIGHT, 13)
+        pyxel.rect(0, 0, constants.APP_WIDTH, constants.APP_HEIGHT, 14)
 
         left = 20
         top = 30
 
-        pyxel.text(left, top, "HIGHSCORES", 7)
+        pyxel.text(left, top, "H I G H S C O R E S", 1)
 
         if not self.highscores:
-            pyxel.text(left, top + 12, "No highscores yet ):", 7)
+            pyxel.text(left, top + 12, "No highscores yet ):", 1)
         else:
             max_entries = 10
             for rank in range(1, min(len(self.highscores), max_entries) + 1):
                 score = self.highscores.get(rank, 0)
-                pyxel.text(left, top + 12 + rank * 10, f"{rank}. {score}", 7)
+                pyxel.text(left, top + 12 + rank * 10, f"{rank} ) {score}", 1)
 
-        pyxel.text(left, top + 140, "PRESS SPACE TO RETURN", 7)
+        pyxel.text(left, top + 140, "PRESS SPACE TO RETURN", 1)
 
 
 
